@@ -26,8 +26,12 @@ class ProviderInfo:
     name: str
     display_name: str
     env_var: str
-    default_model: str
+    default_model: str          # "" = the user picks from the server's model list
     signup_url: str
+    kind: str = "native"        # native SDK, or "openai_compat" (chat completions API)
+    base_url: str = ""          # for openai_compat
+    needs_key: bool = True      # False for local servers (Ollama, LM Studio)
+    local: bool = False         # runs on this machine: nothing leaves it
 
 
 class LLMProvider(ABC):
@@ -98,6 +102,38 @@ _PROVIDERS: dict[str, ProviderInfo] = {
         default_model="gemini-pro-latest",
         signup_url="https://aistudio.google.com/app/apikey",
     ),
+    # Everything below speaks the OpenAI chat completions API (one provider class).
+    "openai": ProviderInfo(
+        name="openai", display_name="OpenAI (GPT)", env_var="OPENAI_API_KEY", default_model="",
+        signup_url="https://platform.openai.com/api-keys",
+        kind="openai_compat", base_url="https://api.openai.com/v1",
+    ),
+    "xai": ProviderInfo(
+        name="xai", display_name="xAI (Grok)", env_var="XAI_API_KEY", default_model="",
+        signup_url="https://console.x.ai",
+        kind="openai_compat", base_url="https://api.x.ai/v1",
+    ),
+    "openrouter": ProviderInfo(
+        name="openrouter", display_name="OpenRouter (hundreds of models)", env_var="OPENROUTER_API_KEY",
+        default_model="", signup_url="https://openrouter.ai/keys",
+        kind="openai_compat", base_url="https://openrouter.ai/api/v1",
+    ),
+    "groq": ProviderInfo(
+        name="groq", display_name="Groq", env_var="GROQ_API_KEY", default_model="",
+        signup_url="https://console.groq.com/keys",
+        kind="openai_compat", base_url="https://api.groq.com/openai/v1",
+    ),
+    "ollama": ProviderInfo(
+        name="ollama", display_name="Ollama (local model)", env_var="OLLAMA_API_KEY", default_model="",
+        signup_url="https://ollama.com/download",
+        kind="openai_compat", base_url="http://localhost:11434/v1", needs_key=False, local=True,
+    ),
+    "custom": ProviderInfo(
+        name="custom", display_name="Other OpenAI-compatible server (LM Studio, vLLM, ...)",
+        env_var="OPENAI_COMPAT_API_KEY", default_model="",
+        signup_url="https://platform.openai.com/docs/api-reference/chat",
+        kind="openai_compat", base_url="", needs_key=False,
+    ),
 }
 
 
@@ -122,7 +158,16 @@ def detect_available() -> list[str]:
     but a key saved via the TUI settings menu is equally valid.
     """
     from ..config import get_api_key  # local to avoid import cycles
-    return [p.name for p in _PROVIDERS.values() if get_api_key(p.env_var)]
+    return [p.name for p in _PROVIDERS.values() if p.needs_key and get_api_key(p.env_var)]
+
+
+def base_url_for(info: ProviderInfo) -> str:
+    """Endpoint for an openai_compat provider: env, then saved setting, then preset."""
+    import os
+    from ..config import get_setting
+    env = {"ollama": "OLLAMA_BASE_URL", "custom": "OPENAI_COMPAT_BASE_URL"}.get(info.name)
+    return ((os.environ.get(env) if env else None)
+            or get_setting(f"base_url:{info.name}") or info.base_url)
 
 
 def build_provider(
@@ -152,10 +197,19 @@ def build_provider(
 
     info = get_provider_info(name)
     key = api_key or get_api_key(info.env_var)
-    if not key:
+    if not key and info.needs_key:
         raise ProviderError(
             f"{info.display_name} requires {info.env_var}. Get a key at {info.signup_url}"
         )
+
+    if info.kind == "openai_compat":
+        from ..config import get_model_for
+        from .openai_compat import OpenAICompatProvider
+        base = base_url_for(info)
+        if not base:
+            raise ProviderError(f"{info.display_name} needs a server URL (Settings, or $OPENAI_COMPAT_BASE_URL).")
+        return OpenAICompatProvider(info, api_key=key, base_url=base,
+                                    model=get_model_for(info.env_var) or info.default_model or None)
 
     if info.name == "claude":
         from .claude import ClaudeProvider

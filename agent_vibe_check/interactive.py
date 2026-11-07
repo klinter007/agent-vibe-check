@@ -207,84 +207,106 @@ def select_from_list(items: list, prompt: str = "Select") -> int | None:
 # ---------------------------------------------------------------------------
 
 
+def _provider_status(info) -> str:
+    if info.local:
+        return "runs on this machine, no key"
+    if not info.needs_key:
+        return "no key needed"
+    return "key found" if vibe_config.get_api_key(info.env_var) else "needs a key"
+
+
+def _pick_model(provider) -> bool:
+    """
+    For providers without a fixed default (OpenAI, Grok, OpenRouter, Ollama...),
+    let the user pick a model from the server's own list once, and save it.
+    """
+    info = provider.info
+    if getattr(provider, "_model", "x") or vibe_config.get_model_for(info.env_var):
+        return True
+    try:
+        models = rolling_status(f"Asking {info.display_name} for its models...", provider.list_models)
+    except ProviderError as e:
+        console.print(f"  [{COLORS['error']}]{e}[/]")
+        if info.local:
+            console.print(f"  [{COLORS['muted']}]Is the local server running? For Ollama: ollama serve, "
+                          f"then ollama pull <model>.[/]")
+        return False
+    if not models:
+        console.print(f"  [{COLORS['warning']}]{info.display_name} returned no chat models.[/]")
+        return False
+    console.print(f"  [{COLORS['subtitle']}]Pick a model for {info.display_name} "
+                  f"(a strong, recent model gives better reviews):[/]")
+    shown = models[:40]
+    for i, m in enumerate(shown, start=1):
+        console.print(f"    [{COLORS['accent']}]{i:>2}[/]. {m}")
+    if len(models) > len(shown):
+        console.print(f"    [{COLORS['muted']}]... {len(models) - len(shown)} more; type a full model id to use one[/]")
+    raw = get_input("Model (number or id)").strip()
+    if raw.isdigit() and 1 <= int(raw) <= len(shown):
+        model = shown[int(raw) - 1]
+    elif raw in models:
+        model = raw
+    else:
+        console.print(f"  [{COLORS['warning']}]No model chosen.[/]")
+        return False
+    vibe_config.set_model_for(info.env_var, model)
+    provider._model = model
+    console.print(f"  [{COLORS['success']}]Using {model}[/] [{COLORS['muted']}](change it in Settings)[/]")
+    return True
+
+
 def select_provider():
-    available = detect_available()
-
-    if len(available) == 1:
-        info = get_provider_info(available[0])
-        console.print(
-            f"  {info.display_name} key: [{COLORS['success']}]Found[/] "
-            f"(${info.env_var})"
-        )
-        try:
-            return build_provider(name=info.name)
-        except ProviderError as e:
-            console.print(f"  [{COLORS['error']}]{e}[/]")
-            return None
-
-    if len(available) > 1:
-        console.print(
-            f"  [{COLORS['subtitle']}]Multiple provider keys detected. Pick one:[/]"
-        )
-        for i, pname in enumerate(available, start=1):
-            info = get_provider_info(pname)
-            console.print(f"    [{COLORS['accent']}]{i}[/]. {info.display_name}")
-        choice = get_input(f"Choice [1-{len(available)}, default 1]") or "1"
-        try:
-            idx = int(choice) - 1
-            name = available[idx]
-        except (ValueError, IndexError):
-            name = available[0]
-        try:
-            return build_provider(name=name)
-        except ProviderError as e:
-            console.print(f"  [{COLORS['error']}]{e}[/]")
-            return None
-
-    console.print(f"  [{COLORS['warning']}]No LLM API key found.[/]")
-    console.print()
+    """
+    Pick the AI that reviews the sessions. Default = the first one with a key.
+    Any OpenAI-compatible server works too, including local models.
+    """
     providers = list_providers()
+    available = detect_available()
+    default_idx = next((i for i, p in enumerate(providers) if p.name in available), 0)
+    console.print(f"  [{COLORS['subtitle']}]Which AI should review your sessions?[/]")
     for i, info in enumerate(providers, start=1):
-        console.print(
-            f"    [{COLORS['accent']}]{i}[/]. {info.display_name} "
-            f"[{COLORS['muted']}]({info.env_var})[/] - {info.signup_url}"
-        )
-    console.print()
-
-    choice = get_input(f"Choose provider [1-{len(providers)}, default 1]") or "1"
+        console.print(f"    [{COLORS['accent']}]{i}[/]. {info.display_name} "
+                      f"[{COLORS['muted']}]({_provider_status(info)})[/]")
+    raw = get_input(f"Choice [1-{len(providers)}]", str(default_idx + 1))
     try:
-        idx = int(choice) - 1
-        info = providers[idx]
+        info = providers[int(raw) - 1]
     except (ValueError, IndexError):
-        info = providers[0]
+        info = providers[default_idx]
 
-    key = console.input(f"  [{COLORS['accent']}]Paste your {info.display_name} key (or Enter to skip)[/]: ", password=True).strip()
-    if not key:
-        return None
+    key = vibe_config.get_api_key(info.env_var)
+    if info.needs_key and not key:
+        console.print(f"  [{COLORS['muted']}]Get a key at {info.signup_url}[/]")
+        key = console.input(f"  [{COLORS['accent']}]Paste your {info.display_name} key (or Enter to skip)[/]: ",
+                            password=True).strip()
+        if not key:
+            return None
+        persist_choice = (get_input("Save this key for next time? [Y/n]") or "y").strip().lower()
+        if persist_choice not in ("n", "no"):
+            try:
+                vibe_config.save_api_key(info.env_var, key)
+                console.print(f"  [{COLORS['success']}]Saved[/] to [dim]{vibe_config._config_path()}[/] "
+                              f"(only you can read it).")
+            except OSError as e:
+                console.print(f"  [{COLORS['warning']}]Could not save: {e}. Key still active for this session.[/]")
+        os.environ[info.env_var] = key
 
-    # Offer to persist. Default yes: the whole point is zero-friction next run.
-    persist_choice = (
-        get_input("Save this key for next time? [Y/n]") or "y"
-    ).strip().lower()
-    if persist_choice not in ("n", "no"):
-        try:
-            vibe_config.save_api_key(info.env_var, key)
-            console.print(
-                f"  [{COLORS['success']}]Saved[/] to "
-                f"[dim]{vibe_config._config_path()}[/] (only you can read it)."
-            )
-        except OSError as e:
-            console.print(
-                f"  [{COLORS['warning']}]Could not save: {e}. "
-                f"Key still active for this session.[/]"
-            )
+    if info.kind == "openai_compat" and info.name == "custom" and not vibe_config.get_setting("base_url:custom") \
+            and not os.environ.get("OPENAI_COMPAT_BASE_URL"):
+        url = get_input("Server URL, e.g. http://localhost:1234/v1").strip()
+        if not url:
+            return None
+        vibe_config.set_setting("base_url:custom", url)
 
-    os.environ[info.env_var] = key
     try:
-        return build_provider(name=info.name, api_key=key)
+        provider = build_provider(name=info.name, api_key=key or None)
     except ProviderError as e:
         console.print(f"  [{COLORS['error']}]{e}[/]")
         return None
+    if info.kind == "openai_compat" and not _pick_model(provider):
+        return None
+    if info.local:
+        console.print(f"  [{COLORS['success']}]Local model: your transcripts never leave this machine.[/]")
+    return provider
 
 
 # ---------------------------------------------------------------------------
@@ -718,16 +740,16 @@ def run_full_pipeline():
 
     # Measured on real history: a session renders to ~10k input tokens on
     # average and the review is ~2k output tokens (thinking included).
+    # Tokens first: plans differ (API, subscription, local). Dollars only
+    # when the price of this exact model is known.
+    tok_in, tok_out = total_sessions * 10_000, total_sessions * 2_000
+    cost_note = f"About {tok_in / 1e6:.1f}M input + {tok_out / 1e6:.1f}M output tokens"
     price = PRICES.get(model_display_for(provider))
     if price:
-        per_session = 10_000 * price[0] / 1e6 + 2_000 * price[1] / 1e6
-        if use_batch:
-            per_session *= 0.5
-        lo, hi = total_sessions * per_session * 0.6, total_sessions * per_session * 1.4
-        cost_note = f"Roughly ${lo:.0f}-${hi:.0f}"
-    else:
-        # No price table for this model: say so instead of guessing.
-        cost_note = f"About {total_sessions * 12_000:,} tokens (check your provider's prices)"
+        usd = (tok_in * price[0] + tok_out * price[1]) / 1e6 * (0.5 if use_batch else 1)
+        cost_note += f" (roughly ${usd * 0.6:.0f}-${usd * 1.4:.0f} at API list price)"
+    elif getattr(provider.info, "local", False):
+        cost_note += " (local model: no API cost)"
     if use_batch:
         time_note = "Stage 1 runs as one batch (usually under an hour, max 24h)"
     else:
@@ -1261,6 +1283,18 @@ def _manage_single_key(info) -> None:
 
 def _prompt_and_set_model(info) -> None:
     console.print()
+    if info.kind == "openai_compat":
+        # Pick from the server's own list (model names change too often to hard-code).
+        vibe_config.set_model_for(info.env_var, None)
+        try:
+            provider = build_provider(name=info.name)
+        except ProviderError as e:
+            console.print(f"  [{COLORS['error']}]{e}[/]")
+            wait_for_key()
+            return
+        _pick_model(provider)
+        wait_for_key()
+        return
     console.print(
         f"  [{COLORS['muted']}]Examples for {info.display_name}:[/]"
     )

@@ -108,8 +108,11 @@ aggregate unchanged.
 ### Providers (`agent_vibe_check/providers/`)
 
 Pluggable. Claude (`claude-sonnet-5-5` default; prompt caching on the
-shared Stage 1 instructions, server-side refusal fallback, Message Batches)
-and Gemini (`gemini-pro-latest`). Adding a new one: subclass `LLMProvider`,
+shared Stage 1 instructions, server-side refusal fallback, Message Batches),
+Gemini (`gemini-pro-latest`, optional extra), and one stdlib
+`OpenAICompatProvider` for OpenAI, xAI, OpenRouter, Groq, Ollama, LM Studio
+and any chat-completions server (the user picks a model from `/models`).
+A new compatible vendor is one registry entry. A new API style: subclass `LLMProvider`,
 implement `analyze(prompt, *, model=None, system=None) -> str`, optionally
 `batch_analyze(...)`, register
 in `providers/__init__._PROVIDERS`, route in `build_provider()`. Pipeline

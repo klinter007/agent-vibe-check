@@ -13,7 +13,8 @@ class GeminiProvider(LLMProvider):
             import google.generativeai as genai
         except ImportError as e:
             raise ProviderError(
-                "google-generativeai not installed. Run: pip install google-generativeai"
+                "Gemini support is optional. Install it with: pip install \"agent-vibe-check[gemini]\" "
+                "(or with uvx: uvx --with google-generativeai --from git+https://github.com/klinter007/agent-vibe-check vibe-check)"
             ) from e
 
         genai.configure(api_key=api_key)
