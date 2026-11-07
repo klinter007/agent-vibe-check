@@ -1,0 +1,50 @@
+# Vibe Check - Development Rules
+
+## Project Context
+Read `AGENTS.md` for the vision, data sources, pipeline and output layout.
+This tool reads local AI-agent chat history (Cursor, Claude Code, Codex,
+Gemini CLI), scores how the user directs agents (six vibe signals),
+measures friction and outcomes, and writes a private report, a shareable
+redacted card, and rules for the user's agent instructions file.
+
+## Package Layout
+- Package: `agent_vibe_check` (do not use the old `cursor_knowledge` name).
+- Entry point: `agent_vibe_check.interactive:main`, exposed as both
+  `vibe-check` and `agent-vibe-check`.
+- One module per chat source in `agent_vibe_check/sources/`.
+- All user-owned output lives under `~/.vibe-check/` (override via
+  `$VIBE_CHECK_HOME`). Never write inside the repo clone.
+
+## Development Approach
+- Senior collaborator, not order-taker. Call out tradeoffs before coding.
+- Minimal deps: `rich`, `anthropic`, `google-generativeai`. Nothing else
+  without justification.
+- Python 3.10+ with type hints. Clear error messages.
+- No `click`. TUI is raw `rich` + `input()`.
+- No emojis in source code or user-facing output.
+- Read only the sources the user enabled in onboarding.
+- Anything written for sharing goes through `redact.py` and `find_leaks`.
+
+## Pipeline (`agent_vibe_check/pipeline/`)
+```
+Stage 1  session_extractor.py    transcript      -> vibes, friction, outcome, rules
+Stage 2  project_synthesizer.py  session facts   -> project synthesis
+Stage 3  timeline.py             session facts   -> monthly + quarterly
+Stage 4  cross_project.py        project synths  -> signal x project matrix
+Stage 5  profile.py              everything      -> archetype, card data, rules
+```
+Each stage writes atomically and caches on content fingerprints plus
+`SCHEMA_VERSION`. Deterministic aggregation runs locally; the LLM only gets
+the judgment-heavy parts.
+
+## LLM Providers (`agent_vibe_check/providers/`)
+1. Subclass `LLMProvider`, implement `analyze(prompt, *, model=None, system=None) -> str`.
+   Optionally override `batch_analyze` (see `providers/claude.py`).
+2. Register in `providers/__init__._PROVIDERS`.
+3. Route in `build_provider()`.
+Pipeline stages must stay provider-agnostic.
+
+## Testing
+- All tests are hermetic: offline fixtures, no tool installs, no live LLM.
+- `FakeProvider` pattern in `tests/test_atlas.py` for LLM-dependent tests.
+- `pytest -q` should be green before shipping. Currently 235+ tests.

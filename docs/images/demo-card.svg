@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<defs><pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="14" stroke="#fff" stroke-width="2.5"/></pattern><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#fff" stroke-opacity="0.07" stroke-width="1"/></pattern></defs>
+<rect width="1080" height="1350" fill="#1b4b8f"/>
+<rect width="1080" height="1350" fill="url(#grid)"/>
+<rect x="3" y="3" width="1074" height="1344" fill="none" stroke="#ffffff" stroke-width="3"/>
+<text x="48" y="46" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="21" fill="#fff" text-anchor="start" fill-opacity="1.0" letter-spacing="3">AI CODING VIBE CHECK</text>
+<text x="1032" y="46" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="21" fill="#fff" text-anchor="end" fill-opacity="1.0" letter-spacing="3">2026.02 → 2026.10</text>
+<line x1="3" y1="72" x2="1077" y2="72" stroke="#ffffff" stroke-width="2"/>
+<text x="48" y="134" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" fill="#fff" text-anchor="start" fill-opacity="0.8" letter-spacing="3">ARCHETYPE — TYPE A-07</text>
+<text x="48" y="236" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="104" font-weight="800" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">Diff Hawk</text>
+<text x="48" y="296" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="34" font-weight="600" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">Reads every line the agent writes.</text>
+<text x="48" y="380" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" fill="#fff" text-anchor="start" fill-opacity="0.85" letter-spacing="3">FRICTION PER SESSION</text>
+<text x="44" y="540" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="150" font-weight="800" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">3×</text>
+<text x="48" y="596" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">less time lost</text>
+<text x="48" y="636" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="30" font-weight="600" fill="#ffffff" text-anchor="start" fill-opacity="0.85" letter-spacing="0">23% → 8%</text>
+<rect x="430" y="420" width="131" height="340" fill="url(#hatch)" stroke="#ffffff" stroke-width="2.5"/>
+<text x="495.5" y="406.0" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="26" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="0">23%</text>
+<text x="495.5" y="798" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="19" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="1">FEB–APR</text>
+<rect x="587" y="477" width="131" height="283" fill="url(#hatch)" stroke="#ffffff" stroke-width="2.5"/>
+<text x="652.5" y="463.09010477071314" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="26" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="0">19%</text>
+<text x="652.5" y="798" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="19" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="1">APR–JUN</text>
+<rect x="744" y="585" width="131" height="175" fill="url(#hatch)" stroke="#ffffff" stroke-width="2.5"/>
+<text x="809.5" y="571.3997465145753" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="26" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="0">12%</text>
+<text x="809.5" y="798" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="19" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="1">JUN–AUG</text>
+<rect x="901" y="641" width="131" height="119" fill="#ffffff"/>
+<text x="966.5" y="627.377536256267" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="26" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="0">8%</text>
+<text x="966.5" y="798" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="19" fill="#fff" text-anchor="middle" fill-opacity="1.0" letter-spacing="1">AUG–OCT</text>
+<line x1="430" y1="760" x2="1032" y2="760" stroke="#ffffff" stroke-width="2"/>
+<line x1="3" y1="840" x2="1077" y2="840" stroke="#ffffff" stroke-width="2"/>
+<text x="48.0" y="922" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="70" font-weight="800" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">312</text>
+<text x="48.0" y="958" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" fill="#fff" text-anchor="start" fill-opacity="1.0" letter-spacing="3">SESSIONS</text>
+<line x1="360" y1="840" x2="360" y2="980" stroke="#ffffff" stroke-width="2"/>
+<text x="408.0" y="922" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="70" font-weight="800" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">73%</text>
+<text x="408.0" y="958" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" fill="#fff" text-anchor="start" fill-opacity="1.0" letter-spacing="3">GOALS REACHED</text>
+<line x1="720" y1="840" x2="720" y2="980" stroke="#ffffff" stroke-width="2"/>
+<text x="768.0" y="922" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="70" font-weight="800" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">9 mo</text>
+<text x="768.0" y="958" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" fill="#fff" text-anchor="start" fill-opacity="1.0" letter-spacing="3">OF BUILDING WITH AI</text>
+<line x1="3" y1="980" x2="1077" y2="980" stroke="#ffffff" stroke-width="2"/>
+<text x="48" y="1036" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" fill="#fff" text-anchor="start" fill-opacity="0.85" letter-spacing="3">MY RULES FOR THE AGENT</text>
+<text x="48" y="1100" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" fill="#fff" text-anchor="start" fill-opacity="0.8" letter-spacing="1">01</text>
+<text x="104" y="1100" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">Show the test output before you say it works</text>
+<text x="48" y="1158" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" fill="#fff" text-anchor="start" fill-opacity="0.8" letter-spacing="1">02</text>
+<text x="104" y="1158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">Ask before you add a new dependency</text>
+<text x="48" y="1216" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" fill="#fff" text-anchor="start" fill-opacity="0.8" letter-spacing="1">03</text>
+<text x="104" y="1216" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" fill="#ffffff" text-anchor="start" fill-opacity="1.0" letter-spacing="0">Keep each change small enough to review</text>
+<line x1="3" y1="1266" x2="1077" y2="1266" stroke="#ffffff" stroke-width="2"/>
+<text x="1032" y="1316" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" fill="#fff" text-anchor="end" fill-opacity="1.0" letter-spacing="0">What&#x27;s yours? github.com/klinter007/agent-vibe-check</text>
+</svg>

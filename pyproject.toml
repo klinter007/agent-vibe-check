@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-vibe-check"
+version = "0.3.0"
+description = "How well do you direct AI coding agents? Reads your Cursor, Claude Code, Codex and Gemini CLI history and gives you a shareable card, a friction report and rules for your agent."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [
+    { name = "Gili Ben Shahar" }
+]
+keywords = ["cursor", "claude-code", "codex", "gemini-cli", "ai", "llm", "claude", "gemini", "developer-tools", "introspection", "knowledge-management"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    "rich>=13.0",
+    "anthropic>=0.40.0",
+    "google-generativeai>=0.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.scripts]
+agent-vibe-check = "agent_vibe_check.interactive:main"
+vibe-check = "agent_vibe_check.interactive:main"
+
+[project.urls]
+Repository = "https://github.com/klinter007/agent-vibe-check"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agent_vibe_check"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
